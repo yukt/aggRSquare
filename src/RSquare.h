@@ -21,6 +21,7 @@ public:
     vector<Bin> aggBins;
     int NoSamples;
     bool hasAlleleFreq;
+    IFILE AlleleFreqFile;
 
     RSquare(UserVariables &ThisUserVariables)
     :myUserVariables(&ThisUserVariables),
@@ -32,6 +33,10 @@ public:
     }
 
     String Analyze();
+    void OpenStreamInputFiles();
+    void CloseStreamInputFiles();
+
+    // Sanity Checks
     bool CheckVcfCompatibility();
     bool CompatibleSamples();
     bool CreateAggBins();

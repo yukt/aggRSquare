@@ -9,6 +9,7 @@
 
 String RSquare::Analyze()
 {
+    // Sanity Check
     if(!CheckVcfCompatibility())
         return "Input.VCF.Dose.Error";
     if(!CreateAggBins())
@@ -17,7 +18,28 @@ String RSquare::Analyze()
         return "Allele.Freq.Error";
     if(!OpenOutputFile())
         return "File.Write.Error";
+
+    // Analysis Starts
+    OpenStreamInputFiles();
+    
+    CloseStreamInputFiles();
+
     return "Success";
+}
+
+void RSquare::OpenStreamInputFiles() {
+    Validation.OpenStream();
+    Imputation.OpenStream();
+    if(hasAlleleFreq)
+        AlleleFreqFile = ifopen(myUserVariables->AlleleFreqFileName, "r");
+}
+
+void RSquare::CloseStreamInputFiles()
+{
+    Validation.CloseStream();
+    Imputation.CloseStream();
+    if(hasAlleleFreq)
+        ifclose(AlleleFreqFile);
 }
 
 // Following are Sanity Checks

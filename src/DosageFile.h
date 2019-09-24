@@ -7,6 +7,8 @@
 
 #include <string>
 #include <StringBasics.h>
+#include "VcfFileReader.h"
+#include "VcfHeader.h"
 
 using namespace std;
 
@@ -19,6 +21,9 @@ public:
     vector<string> SampleNames;
     string ChrId;
 
+    VcfFileReader* InputDosageStream;
+    VcfRecord*     CurrentRecord;
+
     DosageFile(String &filename, string &format)
     {
         FileName = filename;
@@ -30,6 +35,10 @@ public:
     bool ValidFileType();
     bool ValidSampleInfo();
     void clearSampleName() { SampleNames.clear();}
+
+    // Read Records
+    void OpenStream();
+    void CloseStream();
 
 };
 

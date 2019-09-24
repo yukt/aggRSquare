@@ -2,8 +2,6 @@
 // Created by Ketian Yu on 9/23/19.
 //
 #include "DosageFile.h"
-#include "VcfFileReader.h"
-#include "VcfHeader.h"
 
 bool DosageFile::CheckValidity()
 {
@@ -84,4 +82,22 @@ bool DosageFile::ValidSampleInfo()
     }
 
     return true;
+}
+
+void DosageFile::OpenStream()
+{
+    InputDosageStream = new VcfFileReader();
+    CurrentRecord     = new VcfRecord();
+
+    VcfHeader header;
+    InputDosageStream->open( FileName.c_str() , header);
+    InputDosageStream->setSiteOnly(false);
+    InputDosageStream->readRecord(*CurrentRecord);
+    NoMarkers = 0;
+}
+
+void DosageFile::CloseStream()
+{
+    delete InputDosageStream;
+    delete CurrentRecord;
 }
