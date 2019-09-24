@@ -13,6 +13,8 @@ String RSquare::Analyze()
         return "Input.VCF.Dose.Error";
     if(!CreateAggBins())
         return "Aggregate.Bins.Error";
+    if(!CheckAlleleFreqFile())
+        return "Allele.Freq.Error";
     return "Success";
 }
 
@@ -97,7 +99,7 @@ bool RSquare::LoadBinsFile()
 
     while(getline(inFile, line))
     {
-        if(line=="" || line.find("#")==0)
+        if(line.length()==0 || line.find("#")==0)
             continue;
         try
         {
@@ -146,5 +148,63 @@ bool RSquare::LoadBinsFile()
         cout << "\n Program Exiting ... \n\n";
         return false;
     }
+    return true;
+}
+
+bool RSquare::CheckAlleleFreqFile()
+{
+    if(myUserVariables->AlleleFreqFileName=="")
+        return true;
+
+    ifstream inFile(myUserVariables->AlleleFreqFileName);
+    if(!inFile.is_open())
+    {
+        cout << "\n ERROR !!! Program could NOT open Allele Freq file : " << myUserVariables->AlleleFreqFileName << " !!! " << endl;
+        cout << "\n Program Exiting ... \n\n";
+        return false;
+    }
+
+    string line;
+    while(getline(inFile, line)) {
+        if (line.length()==0 || line.find("#") == 0)
+            continue;
+        break;
+    }
+    inFile.close();
+    char* end_str;
+    char* pch = strtok_r((char *)line.c_str(), "\t", &end_str);
+    if(!CheckSNPNameFormat(pch))
+    {
+        cout << "\n ERROR !!! Invalid SNP in Allele Freq file : " << pch << " !!! " << endl;
+        cout << "\n Program Exiting ... \n\n";
+        return false;
+    }
+    if(end_str==NULL)
+    {
+        cout << "\n ERROR !!! Insufficient number of columns in Allele Freq file !!! " << endl;
+        cout << "\n Program Exiting ... \n\n";
+        return false;
+    }
+
+    return true;
+}
+
+bool RSquare::CheckSNPNameFormat(char* snp)
+{
+    int NoColons = 0;
+    for(int i=0; i<strlen(snp); i++)
+    {
+        if(snp[i]==':')
+            NoColons++;
+        if(NoColons > 3)
+            return false;
+    }
+    if(NoColons < 3)
+        return false;
+
+    char* cno = strtok(snp, ":");
+    if(cno != Validation.ChrId)
+        return false;
+
     return true;
 }

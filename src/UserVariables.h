@@ -85,13 +85,13 @@ public:
         }
         if(formatValidation!="DS" and formatValidation!="GT" and formatValidation!="GP")
         {
-            printf("[ERROR:] Invalid argument --validationFormat %s\n", formatValidation.c_str());
+            printf("ERROR !!! Invalid argument --validationFormat %s !!!\n", formatValidation.c_str());
             return false;
         }
 
         if(formatImputation!="DS" and formatImputation!="GT" and formatImputation!="GP")
         {
-            printf("[ERROR:] Invalid argument --imputationFormat %s\n", formatValidation.c_str());
+            printf("ERROR !!! Invalid argument --validationFormat %s !!!\n", formatValidation.c_str());
             return false;
         }
         return true;
