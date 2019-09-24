@@ -87,7 +87,7 @@ bool RSquare::LoadBinsFile()
     ifstream inFile(myUserVariables->BinsFileName);
     if(!inFile.is_open())
     {
-        cout << "\n ERROR !!! Program could NOT open file : " << myUserVariables->BinsFileName << " !!! " << endl;
+        cout << "\n ERROR !!! Program could NOT open Bins file : " << myUserVariables->BinsFileName << " !!! " << endl;
         cout << "\n Program Exiting ... \n\n";
         return false;
     }
@@ -97,7 +97,7 @@ bool RSquare::LoadBinsFile()
 
     while(getline(inFile, line))
     {
-        if(line=="")
+        if(line=="" || line.find("#")==0)
             continue;
         try
         {
