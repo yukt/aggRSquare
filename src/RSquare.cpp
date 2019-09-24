@@ -18,6 +18,7 @@ String RSquare::Analyze()
     return "Success";
 }
 
+// Belowing are Sanity Checks
 bool RSquare::CheckVcfCompatibility()
 {
     if(!Validation.CheckValidity())
@@ -185,6 +186,8 @@ bool RSquare::CheckAlleleFreqFile()
         cout << "\n Program Exiting ... \n\n";
         return false;
     }
+
+    hasAlleleFreq = true;
 
     return true;
 }
