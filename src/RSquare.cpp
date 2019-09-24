@@ -70,9 +70,9 @@ bool RSquare::CreateAggBins()
     if(!LoadBinsFile())
         return false;
 
-    int NoBins = BinsCutoffs.size()-1;
-    aggBins.resize(NoBins);
-    for(int i=0; i<NoBins; i++)
+    NoAggBins = BinsCutoffs.size()-1;
+    aggBins.resize(NoAggBins);
+    for(int i=0; i<NoAggBins; i++)
         aggBins[i].init(i, BinsCutoffs[i], BinsCutoffs[i+1]);
     return true;
 }

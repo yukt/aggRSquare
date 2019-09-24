@@ -16,6 +16,7 @@ class RSquare
 public:
     UserVariables* myUserVariables;
     DosageFile Validation, Imputation;
+    int NoAggBins;
     vector<double> BinsCutoffs;
     vector<Bin> aggBins;
     int NoSamples;
