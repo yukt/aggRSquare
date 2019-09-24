@@ -108,6 +108,7 @@ bool RSquare::LoadBinsFile()
             cout << "\n ERROR !!! Bins file contains invalid value : " << line << " !!! " << endl;
             cout << " Please check file: " << myUserVariables->BinsFileName << endl;
             cout << "\n Program Exiting ... \n\n";
+            inFile.close();
             return false;
         }
         if(value > 0.5)
@@ -115,6 +116,7 @@ bool RSquare::LoadBinsFile()
             cout << "\n ERROR !!! Bins file contains negative MAF cutoff > 0.5 : " << value << " !!! " << endl;
             cout << " Please check file: " << myUserVariables->BinsFileName << endl;
             cout << "\n Program Exiting ... \n\n";
+            inFile.close();
             return false;
         }
         if(value < 0)
@@ -122,6 +124,7 @@ bool RSquare::LoadBinsFile()
             cout << "\n ERROR !!! Bins file contains MAF cutoff : " << value << " !!! " << endl;
             cout << " Please check file: " << myUserVariables->BinsFileName << endl;
             cout << "\n Program Exiting ... \n\n";
+            inFile.close();
             return false;
         }
         if(value < lastValue)
@@ -129,6 +132,7 @@ bool RSquare::LoadBinsFile()
             cout << "\n ERROR !!! Decreasing cutoff in bin file : " << value << " < " << lastValue << " !!! " << endl;
             cout << " Please check file: " << myUserVariables->BinsFileName << endl;
             cout << "\n Program Exiting ... \n\n";
+            inFile.close();
             return false;
         }
         lastValue = value;
