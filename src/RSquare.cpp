@@ -15,10 +15,12 @@ String RSquare::Analyze()
         return "Aggregate.Bins.Error";
     if(!CheckAlleleFreqFile())
         return "Allele.Freq.Error";
+    if(!OpenOutputFile())
+        return "File.Write.Error";
     return "Success";
 }
 
-// Belowing are Sanity Checks
+// Following are Sanity Checks
 bool RSquare::CheckVcfCompatibility()
 {
     if(!Validation.CheckValidity())
@@ -210,4 +212,19 @@ bool RSquare::CheckSNPNameFormat(char* snp)
         return false;
 
     return true;
+}
+
+bool RSquare::OpenOutputFile()
+{
+    ofstream OutFile(myUserVariables->OutputPrefix+".aggRSquare");
+    if(!OutFile.is_open())
+    {
+        cout << "\n ERROR !!! Program could NOT create the output file " << myUserVariables->OutputPrefix+".aggRSquare" << " !!!" << endl;
+        cout <<" Please check your write permissions in the output directory\n OR maybe the output directory does NOT exist ...\n";
+        cout << "\n Program Exiting ... \n\n";
+        return false;
+    }
+    OutFile.close();
+    return true;
+
 }

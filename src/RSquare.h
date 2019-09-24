@@ -38,6 +38,7 @@ public:
     bool LoadBinsFile();
     bool CheckAlleleFreqFile();
     bool CheckSNPNameFormat(char* snp);
+    bool OpenOutputFile();
 };
 
 #endif //AGGRSQUARE_RSQUARE_H
