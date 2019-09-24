@@ -134,6 +134,7 @@ bool RSquare::LoadBinsFile()
         lastValue = value;
         BinsCutoffs.push_back(value);
     }
+    inFile.close();
 
     if(BinsCutoffs.size()<2)
     {
