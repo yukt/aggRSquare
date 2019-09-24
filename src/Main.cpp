@@ -6,7 +6,7 @@ void helpFile();
 
 int main(int argc, char ** argv)
 {
-    RSquare myAnalysis;
+    UserVariables myUserVariables;
 
     int c;
     static struct option loptions[] =
@@ -26,27 +26,33 @@ int main(int argc, char ** argv)
     while ((c = getopt_long(argc, argv, "v:i:o:f:g:a:b:",loptions,NULL)) >= 0)
     {
         switch (c) {
-            case 'v': myAnalysis.myUserVariables.ValidationFileName = optarg;   break;
-            case 'i': myAnalysis.myUserVariables.ImputationFileName = optarg;   break;
-            case 'o': myAnalysis.myUserVariables.OutputPrefix       = optarg;   break;
-            case 'f': myAnalysis.myUserVariables.formatValidation   = optarg;   break;
-            case 'g': myAnalysis.myUserVariables.formatImputation   = optarg;   break;
-            case 'a': myAnalysis.myUserVariables.AlleleFreqFileName = optarg;   break;
-            case 'b': myAnalysis.myUserVariables.BinsFileName       = optarg;   break;
+            case 'v': myUserVariables.ValidationFileName = optarg;   break;
+            case 'i': myUserVariables.ImputationFileName = optarg;   break;
+            case 'o': myUserVariables.OutputPrefix       = optarg;   break;
+            case 'f': myUserVariables.formatValidation   = optarg;   break;
+            case 'g': myUserVariables.formatImputation   = optarg;   break;
+            case 'a': myUserVariables.AlleleFreqFileName = optarg;   break;
+            case 'b': myUserVariables.BinsFileName       = optarg;   break;
             case 'h': helpFile(); return 0;
             case '?': helpFile(); return 0;
             default: printf("[ERROR:] Unknown argument: %s\n", optarg);
         }
     }
 
-    if(!myAnalysis.myUserVariables.CheckValidity()) return -1;
+    if(!myUserVariables.CheckValidity()) return -1;
 
     aggRSquareVersion();
-    myAnalysis.myUserVariables.Status();
+    RSquare myAnalysis(myUserVariables);
+    myAnalysis.myUserVariables->Status();
 
     int start_time = time(0);
-    myAnalysis.myUserVariables.CreateCommandLine(argc,argv);
+    myAnalysis.myUserVariables->CreateCommandLine(argc,argv);
 
+    String MySuccessStatus="Error";
+    MySuccessStatus = myAnalysis.Analyze();
+
+    if(MySuccessStatus!="Success")
+        return -1;
 
     int time_tot = time(0) - start_time;
     return 0;

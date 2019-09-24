@@ -19,7 +19,7 @@ find_package(ZLIB REQUIRED)
 find_library(STATGEN_LIBRARY StatGen)
 add_executable(aggRSquare
 	src/Main.cpp
-        src/RSquare.h src/aggBin.h src/UserVariables.h)
+        src/RSquare.h src/aggBin.h src/UserVariables.h src/DosageFile.h src/RSquare.cpp src/DosageFile.cpp)
 target_link_libraries(aggRSquare ${STATGEN_LIBRARY} ${ZLIB_LIBRARIES})
 
 install(TARGETS aggRSquare RUNTIME DESTINATION bin)
