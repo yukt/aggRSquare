@@ -3,13 +3,16 @@
 //
 
 #include "RSquare.h"
+#include <iostream>
+#include <fstream>
+#include <exception>
 
 String RSquare::Analyze()
 {
     if(!CheckVcfCompatibility())
         return "Input.VCF.Dose.Error";
-
-
+    if(!CreateAggBins())
+        return "Aggregate.Bins.Error";
     return "Success";
 }
 
@@ -59,5 +62,84 @@ bool RSquare::CompatibleSamples()
     Validation.clearSampleName();
     Imputation.clearSampleName();
 
+    return true;
+}
+
+bool RSquare::CreateAggBins()
+{
+    if(!LoadBinsFile())
+        return false;
+
+    int NoBins = BinsCutoffs.size()-1;
+    aggBins.resize(NoBins);
+    for(int i=0; i<NoBins; i++)
+        aggBins[i].init(i, BinsCutoffs[i], BinsCutoffs[i+1]);
+    return true;
+}
+
+bool RSquare::LoadBinsFile()
+{
+    if(myUserVariables->BinsFileName=="")
+        return true;
+
+    BinsCutoffs.clear();
+
+    ifstream inFile(myUserVariables->BinsFileName);
+    if(!inFile.is_open())
+    {
+        cout << "\n ERROR !!! Program could NOT open file : " << myUserVariables->BinsFileName << " !!! " << endl;
+        cout << "\n Program Exiting ... \n\n";
+        return false;
+    }
+
+    double value, lastValue=-1e-6;
+    string line;
+
+    while(getline(inFile, line))
+    {
+        if(line=="")
+            continue;
+        try
+        {
+            value = stof(line);
+        }
+        catch (exception& e)
+        {
+            cout << "\n ERROR !!! Bins file contains invalid value : " << line << " !!! " << endl;
+            cout << " Please check file: " << myUserVariables->BinsFileName << endl;
+            cout << "\n Program Exiting ... \n\n";
+            return false;
+        }
+        if(value > 0.5)
+        {
+            cout << "\n ERROR !!! Bins file contains negative MAF cutoff > 0.5 : " << value << " !!! " << endl;
+            cout << " Please check file: " << myUserVariables->BinsFileName << endl;
+            cout << "\n Program Exiting ... \n\n";
+            return false;
+        }
+        if(value < 0)
+        {
+            cout << "\n ERROR !!! Bins file contains MAF cutoff : " << value << " !!! " << endl;
+            cout << " Please check file: " << myUserVariables->BinsFileName << endl;
+            cout << "\n Program Exiting ... \n\n";
+            return false;
+        }
+        if(value < lastValue)
+        {
+            cout << "\n ERROR !!! Decreasing cutoff in bin file : " << value << " < " << lastValue << " !!! " << endl;
+            cout << " Please check file: " << myUserVariables->BinsFileName << endl;
+            cout << "\n Program Exiting ... \n\n";
+            return false;
+        }
+        lastValue = value;
+        BinsCutoffs.push_back(value);
+    }
+
+    if(BinsCutoffs.size()<2)
+    {
+        cout << "\n ERROR !!! Insufficient #cutoffs in bin file : " << myUserVariables->BinsFileName << endl;
+        cout << "\n Program Exiting ... \n\n";
+        return false;
+    }
     return true;
 }

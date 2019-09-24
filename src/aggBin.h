@@ -23,11 +23,19 @@ public:
 
 class Bin : private Record
 {
+    int BinId;
     int NoVariants;
     double lowerBound, upperBound;
+public:
     Bin()
     {
         NoVariants = 0;
+    }
+    void init(int id, double low, double up)
+    {
+        BinId = id;
+        lowerBound = low;
+        upperBound = up;
     }
 };
 

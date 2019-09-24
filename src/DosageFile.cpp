@@ -75,15 +75,12 @@ bool DosageFile::ValidSampleInfo()
 
     ChrId = record.getChromStr();
     VcfRecordGenotype &ThisGenotype=record.getGenotypeInfo();
-    for(int i=0; i<NoSamples; i++)
+    const string* temp = ThisGenotype.getString(Format, 0);
+    if(temp==NULL)
     {
-        const string* temp = ThisGenotype.getString(Format, i);
-        if(temp==NULL)
-        {
-            cout << "\n ERROR !!! " << FileName << " does not contain format " << Format << " !!! " << endl;
-            cout << "\n Program Exiting ... \n\n";
-            return false;
-        }
+        cout << "\n ERROR !!! " << FileName << " does not contain format " << Format << " !!! " << endl;
+        cout << "\n Program Exiting ... \n\n";
+        return false;
     }
 
     return true;
