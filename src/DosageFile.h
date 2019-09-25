@@ -23,6 +23,9 @@ public:
 
     VcfFileReader* InputDosageStream;
     VcfRecord*     CurrentRecord;
+    VcfRecordGenotype* GenotypeInfo;
+    int CurrentBp;
+    string CurrentVariantName;
 
     DosageFile(String &filename, string &format)
     {
@@ -39,6 +42,9 @@ public:
     // Read Records
     void OpenStream();
     void CloseStream();
+    bool ReadRecord();
+    double GetDosage(int SampleId);
+    double GetNumGeno(int SampleId);
 
 };
 

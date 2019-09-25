@@ -83,13 +83,13 @@ public:
             cout<< " Program Exiting ...\n\n";
             return false;
         }
-        if(formatValidation!="DS" and formatValidation!="GT" and formatValidation!="GP")
+        if(formatValidation!="DS" and formatValidation!="GT" and formatValidation!="HDS")
         {
             printf("ERROR !!! Invalid argument --validationFormat %s !!!\n", formatValidation.c_str());
             return false;
         }
 
-        if(formatImputation!="DS" and formatImputation!="GT" and formatImputation!="GP")
+        if(formatImputation!="DS" and formatImputation!="GT" and formatImputation!="HDS")
         {
             printf("ERROR !!! Invalid argument --validationFormat %s !!!\n", formatValidation.c_str());
             return false;

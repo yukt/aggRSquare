@@ -21,13 +21,142 @@ String RSquare::Analyze()
 
     // Analysis Starts
     OpenStreamInputFiles();
-    
+
+    if(!EvaluateAggRSquare())
+    {
+        CloseStreamInputFiles();
+        return "Allele.Freq.Error";
+    }
+
     CloseStreamInputFiles();
+
+    if(!OutputAggRSquare())
+        return "File.Write.Error";
 
     return "Success";
 }
 
-void RSquare::OpenStreamInputFiles() {
+bool RSquare::EvaluateAggRSquare()
+{
+    NoCommonVariants = 0;
+    while(true)
+    {
+        if(!FindCommonVariant())
+            return true;
+        if(!ProcessCommonVariant())
+            return false;
+        if(!UpdateInputRecords())
+            return true;
+    }
+}
+
+bool RSquare::FindCommonVariant()
+{
+    while(true)
+    {
+        while(Validation.CurrentBp < Imputation.CurrentBp)
+        {
+            if(!Validation.ReadRecord())
+                return false;
+        }
+        while(Validation.CurrentBp > Imputation.CurrentBp)
+        {
+            if(!Imputation.ReadRecord())
+                return false;
+        }
+        if(Validation.CurrentVariantName==Imputation.CurrentVariantName)
+        {
+            NoCommonVariants++;
+            return true;
+        }
+        if(!Imputation.ReadRecord())
+            return false;
+    }
+}
+
+
+bool RSquare::ProcessCommonVariant()
+{
+    CurrentRecord.clear();
+    for(int i=0; i<NoSamples; i++)
+        CurrentRecord.Update(Validation.GetNumGeno(i), Validation.GetDosage(i), Imputation.GetDosage(i));
+    double freq = GetAlleleFreq();
+    if(freq < 0)
+        return false;
+    UpdateAggBins(freq);
+    return true;
+}
+
+double RSquare::GetAlleleFreq()
+{
+    if(hasAlleleFreq)
+    {
+        string line;
+        while(NoAlleleFreqRead < Validation.NoMarkers)
+        {
+            line = "";
+            if(AlleleFreqFile->readLine(line)<0)
+            {
+                cout << "\n ERROR !!! Allele Freq file has fewer records than Validation VCF file !!! " << endl;
+                cout << "\n Program Exiting ... \n\n";
+                return -1;
+            }
+            if (line.length()==0 || line.find("#") == 0)
+                continue;
+            NoAlleleFreqRead++;
+        }
+        char* pch = strtok((char *)line.c_str(), "\t");
+        string VariantName(pch);
+        if(VariantName != Validation.CurrentVariantName)
+        {
+            cout << "\n ERROR !!! Allele Freq file does NOT match Validation VCF file !!! " << endl;
+            cout << "\n Program Exiting ... \n\n";
+            return -1;
+        }
+        pch = strtok(NULL, "\t");
+        double AlleleFreq;
+        try
+        {
+            AlleleFreq = stod(pch);
+        }
+        catch (exception& e)
+        {
+            return 0;
+        }
+        return AlleleFreq;
+    }
+    return CurrentRecord.GetAlleleFreq();
+}
+
+void RSquare::UpdateAggBins(double freq)
+{
+    double maf = min(freq, 1.0-freq);
+
+    if(maf > BinsCutoffs[0])
+    {
+        for(int i=0; i<NoAggBins; i++)
+        {
+            if(maf <= BinsCutoffs[i+1])
+            {
+                aggBins[i].AddRecord(CurrentRecord, freq);
+                break;
+            }
+        }
+    }
+}
+
+bool RSquare::UpdateInputRecords()
+{
+    if(!Validation.ReadRecord())
+        return false;
+    if(!Imputation.ReadRecord())
+        return false;
+    return true;
+}
+
+
+void RSquare::OpenStreamInputFiles()
+{
     Validation.OpenStream();
     Imputation.OpenStream();
     if(hasAlleleFreq)
@@ -41,6 +170,38 @@ void RSquare::CloseStreamInputFiles()
     if(hasAlleleFreq)
         ifclose(AlleleFreqFile);
 }
+
+bool RSquare::OutputAggRSquare()
+{
+    ofstream OutFile(myUserVariables->OutputPrefix+".aggRSquare");
+    if(!OutFile.is_open())
+    {
+        cout << "\n ERROR !!! Program could NOT create the output file " << myUserVariables->OutputPrefix+".aggRSquare" << " !!!" << endl;
+        cout <<" Please check your write permissions in the output directory\n OR maybe the output directory does NOT exist ...\n";
+        cout << "\n Program Exiting ... \n\n";
+        return false;
+    }
+
+    OutFile << "Aggregate.Bin\tAverage.MAF\t#Variants\tImputation.R2\tGold.MAF\tImputed.MAF" << endl;
+    OutFile << std::fixed << std::setprecision(6);
+
+    for(int i=0; i<NoAggBins; i++)
+    {
+        Bin& ThisBin = aggBins[i];
+        ThisBin.Summarize();
+
+        if(ThisBin.NoVariants > 0)
+        {
+            OutFile << "(" << ThisBin.lowerBound << "," << ThisBin.upperBound << "]" << "\t" \
+            << ThisBin.MAF << "\t" << ThisBin.NoVariants << "\t" \
+            << ThisBin.R2 << "\t" << ThisBin.ValidationMAF << "\t" << ThisBin.ImputationMAF << endl;
+        }
+    }
+
+    OutFile.close();
+    return true;
+}
+
 
 // Following are Sanity Checks
 bool RSquare::CheckVcfCompatibility()

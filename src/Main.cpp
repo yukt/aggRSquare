@@ -80,8 +80,8 @@ void helpFile()
     printf( "   -v [Validation.vcf.gz]         // [Required] Input Validation File\n");
     printf( "   -i [Imputation.vcf.gz]         // [Required] Input Imputation File\n");
     printf( "   -o [OutputPrefix]              // [Required] Output Prefix\n");
-    printf( "   --validationFormat [GT/DS/GP]  // [Optional] Genotype info format (Default: GT)\n");
-    printf( "   --imputationFormat [GT/DS/GP]  // [Optional] Genotype info format (Default: DS)\n");
+    printf( "   --validationFormat [GT/DS/HDS] // [Optional] Genotype info format (Default: GT)\n");
+    printf( "   --imputationFormat [GT/DS/HDS] // [Optional] Genotype info format (Default: DS)\n");
     printf( "   --AF [AlleleFrequency File]    // [Optional] See Note (a)\n");
     printf( "   --bins [Bins File]             // [Optional] Default: See defaultBins.txt\n");
     printf( "   -h, --help                          If ON, detailed help on options and usage. \n");

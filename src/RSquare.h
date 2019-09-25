@@ -16,12 +16,13 @@ class RSquare
 public:
     UserVariables* myUserVariables;
     DosageFile Validation, Imputation;
-    int NoAggBins;
+    int NoAggBins, NoCommonVariants, NoSamples;
     vector<double> BinsCutoffs;
     vector<Bin> aggBins;
-    int NoSamples;
     bool hasAlleleFreq;
     IFILE AlleleFreqFile;
+    int NoAlleleFreqRead;
+    Record CurrentRecord;
 
     RSquare(UserVariables &ThisUserVariables)
     :myUserVariables(&ThisUserVariables),
@@ -30,11 +31,20 @@ public:
     BinsCutoffs({0,0.0005,0.001,0.002,0.005,0.010,0.015,0.020,0.035,0.05,0.1,0.2,0.3,0.4,0.5}),
     hasAlleleFreq(false)
     {
+        NoAlleleFreqRead = 0;
     }
 
     String Analyze();
     void OpenStreamInputFiles();
+    bool EvaluateAggRSquare();
     void CloseStreamInputFiles();
+    bool OutputAggRSquare();
+
+    bool FindCommonVariant();
+    bool ProcessCommonVariant();
+    double GetAlleleFreq();
+    void UpdateAggBins(double freq);
+    bool UpdateInputRecords();
 
     // Sanity Checks
     bool CheckVcfCompatibility();

@@ -2,6 +2,7 @@
 // Created by Ketian Yu on 9/23/19.
 //
 #include "DosageFile.h"
+#define MAXBP 999999999
 
 bool DosageFile::CheckValidity()
 {
@@ -92,12 +93,46 @@ void DosageFile::OpenStream()
     VcfHeader header;
     InputDosageStream->open( FileName.c_str() , header);
     InputDosageStream->setSiteOnly(false);
-    InputDosageStream->readRecord(*CurrentRecord);
     NoMarkers = 0;
+    ReadRecord();
 }
 
 void DosageFile::CloseStream()
 {
     delete InputDosageStream;
     delete CurrentRecord;
+}
+
+bool DosageFile::ReadRecord()
+{
+    if(InputDosageStream->readRecord(*CurrentRecord))
+    {
+        CurrentBp = CurrentRecord->get1BasedPosition();
+        string chr(CurrentRecord->getChromStr());
+        CurrentVariantName = chr+":"+to_string(CurrentBp)+":"+ CurrentRecord->getRefStr()+":"+CurrentRecord->getAltStr();
+        GenotypeInfo = &(CurrentRecord->getGenotypeInfo());
+        NoMarkers++;
+        return true;
+    }
+    CurrentBp = MAXBP;
+    CurrentVariantName = "No:More:Variant:Period";
+    return false;
+}
+
+double DosageFile::GetDosage(int SampleId)
+{
+    string temp=*GenotypeInfo->getString(Format,SampleId);
+    double dosage = 0.0;
+    char *pch = strtok((char *)temp.c_str(),"|");
+    while (pch != NULL)
+    {
+        if(strcmp(pch, ".") == 0) return -1;
+        dosage += stod(pch);
+        pch = strtok (NULL, "|");
+    }
+    return dosage;
+}
+
+double DosageFile::GetNumGeno(int SampleId){
+    return CurrentRecord->getNumGTs(SampleId);
 }
