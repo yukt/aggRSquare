@@ -16,11 +16,12 @@ class RSquare
 public:
     UserVariables* myUserVariables;
     DosageFile Validation, Imputation;
-    int NoAggBins, NoCommonVariants, NoSamples;
+    int NoAggBins, NoCommonVariants, NoSamples, NoCommonVariantsAnalyzed;
     vector<double> BinsCutoffs;
     vector<Bin> aggBins;
     bool hasAlleleFreq;
     IFILE AlleleFreqFile;
+//    IFILE CommonSNPsFile;
     int NoAlleleFreqRead;
     Record CurrentRecord;
 

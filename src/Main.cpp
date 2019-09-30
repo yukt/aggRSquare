@@ -23,7 +23,7 @@ int main(int argc, char ** argv)
                     {NULL,0,NULL,0}
             };
 
-    while ((c = getopt_long(argc, argv, "v:i:o:f:g:a:b:",loptions,NULL)) >= 0)
+    while ((c = getopt_long(argc, argv, "v:i:o:f:g:a:b:h",loptions,NULL)) >= 0)
     {
         switch (c) {
             case 'v': myUserVariables.ValidationFileName = optarg;   break;
@@ -55,6 +55,9 @@ int main(int argc, char ** argv)
         return -1;
 
     int time_tot = time(0) - start_time;
+    cout << "\n Analysis finished." << endl;
+    cout << "   -- Analyzed " << myAnalysis.NoCommonVariantsAnalyzed << " common variants." << endl;
+    cout << "   -- Analysis took " << time_tot << " seconds." << endl;
     return 0;
 }
 

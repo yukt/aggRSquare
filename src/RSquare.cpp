@@ -40,6 +40,7 @@ String RSquare::Analyze()
 bool RSquare::EvaluateAggRSquare()
 {
     NoCommonVariants = 0;
+    NoCommonVariantsAnalyzed = 0;
     while(true)
     {
         if(!FindCommonVariant())
@@ -55,18 +56,23 @@ bool RSquare::FindCommonVariant()
 {
     while(true)
     {
-        while(Validation.CurrentBp < Imputation.CurrentBp)
+        while(Validation.CurrentBp != Imputation.CurrentBp)
         {
-            if(!Validation.ReadRecord())
-                return false;
+            while(Validation.CurrentBp < Imputation.CurrentBp)
+            {
+                if(!Validation.ReadRecord())
+                    return false;
+            }
+            while(Validation.CurrentBp > Imputation.CurrentBp)
+            {
+                if(!Imputation.ReadRecord())
+                    return false;
+            }
         }
-        while(Validation.CurrentBp > Imputation.CurrentBp)
-        {
-            if(!Imputation.ReadRecord())
-                return false;
-        }
+
         if(Validation.CurrentVariantName==Imputation.CurrentVariantName)
         {
+//            ifprintf(CommonSNPsFile, "%s\n", Validation.CurrentVariantName.c_str());
             NoCommonVariants++;
             return true;
         }
@@ -140,6 +146,7 @@ void RSquare::UpdateAggBins(double freq)
             if(maf <= BinsCutoffs[i+1])
             {
                 aggBins[i].AddRecord(CurrentRecord, freq);
+                NoCommonVariantsAnalyzed++;
                 break;
             }
         }
@@ -168,6 +175,7 @@ void RSquare::CloseStreamInputFiles()
 {
     Validation.CloseStream();
     Imputation.CloseStream();
+//    ifclose(CommonSNPsFile);
     if(hasAlleleFreq)
         ifclose(AlleleFreqFile);
 }
@@ -341,7 +349,12 @@ bool RSquare::LoadBinsFile()
 bool RSquare::CheckAlleleFreqFile()
 {
     if(myUserVariables->AlleleFreqFileName=="")
+    {
+        cout << " WARNING: Missing allele freq file ( --AF ) !!!" << endl;
+        cout << "          Variants will be aggregated by allele freq calculated from validation vcf file." << endl;
         return true;
+    }
+
 
     ifstream inFile(myUserVariables->AlleleFreqFileName);
     if(!inFile.is_open())
@@ -409,6 +422,7 @@ bool RSquare::OpenOutputFile()
         return false;
     }
     OutFile.close();
+//    CommonSNPsFile = ifopen("CommonSNPs", "w");
     return true;
 
 }
