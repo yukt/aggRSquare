@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <exception>
+#include <iomanip>
 
 String RSquare::Analyze()
 {
