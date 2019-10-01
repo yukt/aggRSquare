@@ -126,12 +126,15 @@ double DosageFile::GetDosage(int SampleId)
     char *pch = strtok((char *)temp.c_str(),"|");
     while (pch != NULL)
     {
+        if(strcmp(pch, "0")==0)
+            return -1;
         try
         {
             dosage += stod(pch);
         }
         catch(exception& e)
         {
+            cout << FileName << " : " << CurrentVariantName << "SampleId" << SampleId << " - "  << *pch << endl;
             return -1;
         }
         pch = strtok (NULL, "|");
