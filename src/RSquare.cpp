@@ -126,11 +126,7 @@ double RSquare::GetAlleleFreq()
         {
             AlleleFreq = stod(pch);
         }
-//        catch (exception& e)
-//        {
-//            return 0;
-//        }
-        catch (const std::invalid_argument& ia)
+        catch (exception& e)
         {
             cout << " Warning !!! " << "Skip" << VariantName << " ( invalid allele frequency " << pch << ") !!!" << endl;
             return 0;

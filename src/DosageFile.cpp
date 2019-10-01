@@ -126,8 +126,14 @@ double DosageFile::GetDosage(int SampleId)
     char *pch = strtok((char *)temp.c_str(),"|");
     while (pch != NULL)
     {
-        if(strcmp(pch, ".") == 0) return -1;
-        dosage += stod(pch);
+        try
+        {
+            dosage += stod(pch);
+        }
+        catch(exception& e)
+        {
+            return -1;
+        }
         pch = strtok (NULL, "|");
     }
     return dosage;
