@@ -6,7 +6,8 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
-#include <stdexcept>
+#include <exception>
+#include <time.h>
 
 String RSquare::Analyze()
 {
@@ -183,32 +184,40 @@ void RSquare::CloseStreamInputFiles()
 
 bool RSquare::OutputAggRSquare()
 {
-    ofstream OutFile(myUserVariables->OutputPrefix+".aggRSquare");
-    if(!OutFile.is_open())
-    {
-        cout << "\n ERROR !!! Program could NOT create the output file " << myUserVariables->OutputPrefix+".aggRSquare" << " !!!" << endl;
-        cout <<" Please check your write permissions in the output directory\n OR maybe the output directory does NOT exist ...\n";
-        cout << "\n Program Exiting ... \n\n";
-        return false;
-    }
+    FILE* OutFile = fopen(myUserVariables->OutputPrefix+".aggRSquare", "w");
 
-    OutFile << "Aggregate.Bin\tAverage.MAF\t#Variants\tImputation.R2\tGold.MAF\tImputed.MAF" << endl;
-    OutFile << std::fixed << std::setprecision(6);
+    time_t rawtime;
+    struct tm * timeinfo;
 
-    for(int i=0; i<NoAggBins; i++)
-    {
-        Bin& ThisBin = aggBins[i];
+    time (&rawtime);
+    timeinfo = localtime (&rawtime);
+    fprintf(OutFile, "##filedate=%d.%d.%d\n",(timeinfo->tm_year + 1900),(timeinfo->tm_mon + 1) ,timeinfo->tm_mday);
+    fprintf(OutFile, "##source=aggRSquare.v%s\n",VERSION);
+    fprintf(OutFile, "##validation=%s\n", Validation.FileName.c_str());
+    fprintf(OutFile, "##imputation=%s\n", Imputation.FileName.c_str());
+    fprintf(OutFile, "##validationFormat=%s\n", Validation.Format.c_str());
+    fprintf(OutFile, "##imputationFormat=%s\n", Imputation.Format.c_str());
+    if(hasAlleleFreq) fprintf(OutFile, "##AF=%s\n", myUserVariables->AlleleFreqFileName.c_str());
+    else fprintf(OutFile, "##Allele frequencies were calculated from validation file.\n");
+    fprintf(OutFile,"##aggRSquare_Command=%s\n", myUserVariables->CommandLine.c_str());
+
+    fprintf(OutFile, "#Bin.Aggregated.by.MAF\tAverage.MAF\t#Variants\tImputation.R2\tGold.MAF\tImputed.MAF\n");
+    for(int i=0; i<NoAggBins; i++) {
+        Bin &ThisBin = aggBins[i];
         ThisBin.Summarize();
-
-        if(ThisBin.NoVariants > 0)
-        {
-            OutFile << "(" << ThisBin.lowerBound << "," << ThisBin.upperBound << "]" << "\t" \
-            << ThisBin.MAF << "\t" << ThisBin.NoVariants << "\t" \
-            << ThisBin.R2 << "\t" << ThisBin.ValidationMAF << "\t" << ThisBin.ImputationMAF << endl;
+        if (ThisBin.NoVariants > 0) {
+            fprintf(OutFile, "(%f,%f]\t%f\t%-9d\t%f\t%f\t%f\n",
+                    ThisBin.lowerBound, ThisBin.upperBound,
+                    ThisBin.MAF,
+                    ThisBin.NoVariants,
+                    ThisBin.R2,
+                    ThisBin.ValidationMAF,
+                    ThisBin.ImputationMAF);
+        } else {
+            printf(" Notice!!! Bin (%f,%f] is empty.\n", ThisBin.lowerBound, ThisBin.upperBound);
         }
     }
-
-    OutFile.close();
+    fclose(OutFile);
     return true;
 }
 
