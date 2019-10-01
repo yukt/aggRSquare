@@ -126,7 +126,7 @@ double DosageFile::GetDosage(int SampleId)
     char *pch = strtok((char *)temp.c_str(),"|");
     while (pch != NULL)
     {
-        if(strcmp(pch, "0")==0)
+        if(strcmp(pch, ".")==0)
             return -1;
         try
         {
