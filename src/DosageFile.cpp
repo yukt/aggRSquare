@@ -123,7 +123,7 @@ double DosageFile::GetDosage(int SampleId)
 {
     string temp=*GenotypeInfo->getString(Format,SampleId);
     double dosage = 0.0;
-    char *pch = strtok((char *)temp.c_str(),"|");
+    char *pch = strtok((char *)temp.c_str(),"|/");
     while (pch != NULL)
     {
         if(strcmp(pch, ".")==0)
@@ -137,7 +137,7 @@ double DosageFile::GetDosage(int SampleId)
             cout << FileName << " : " << CurrentVariantName << " SampleId " << SampleId << "[" << *pch << "]" << endl;
             return -1;
         }
-        pch = strtok (NULL, "|");
+        pch = strtok (NULL, "|/");
     }
     return dosage;
 }
