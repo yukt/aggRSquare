@@ -134,7 +134,7 @@ double DosageFile::GetDosage(int SampleId)
         }
         catch(exception& e)
         {
-            cout << FileName << " : " << CurrentVariantName << "SampleId" << SampleId << " - "  << *pch << endl;
+            cout << FileName << " : " << CurrentVariantName << " SampleId " << SampleId << "[" << *pch << "]" << endl;
             return -1;
         }
         pch = strtok (NULL, "|");
