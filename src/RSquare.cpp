@@ -5,8 +5,8 @@
 #include "RSquare.h"
 #include <iostream>
 #include <fstream>
-#include <exception>
 #include <iomanip>
+#include <stdexcept>
 
 String RSquare::Analyze()
 {
@@ -126,8 +126,13 @@ double RSquare::GetAlleleFreq()
         {
             AlleleFreq = stod(pch);
         }
-        catch (exception& e)
+//        catch (exception& e)
+//        {
+//            return 0;
+//        }
+        catch (const std::invalid_argument& ia)
         {
+            cout << " Warning !!! " << "Skip" << VariantName << " ( invalid allele frequency " << pch << ") !!!" << endl;
             return 0;
         }
         return AlleleFreq;

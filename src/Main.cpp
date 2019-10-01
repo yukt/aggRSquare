@@ -48,8 +48,7 @@ int main(int argc, char ** argv)
     int start_time = time(0);
     myAnalysis.myUserVariables->CreateCommandLine(argc,argv);
 
-    String MySuccessStatus="Error";
-    MySuccessStatus = myAnalysis.Analyze();
+    String MySuccessStatus = myAnalysis.Analyze();
 
     if(MySuccessStatus!="Success")
         return -1;
