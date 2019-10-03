@@ -88,7 +88,8 @@ void helpFile()
     printf( "   --imputationFormat [GT/DS/HDS] // [Optional] Genotype info format (Default: DS)\n");
     printf( "   --AF [AlleleFrequency File]    // [Optional] See Note (a)\n");
     printf( "   --bins [Bins File]             // [Optional] Default: See defaultBins.txt\n");
-    printf( "   -h, --help                          If ON, detailed help on options and usage. \n");
+    printf( "   --detail                       // [Optional] OFF by default. If ON, variant-wise R2 will be output.\n");
+    printf( "   -h, --help                     //  If ON, detailed help on options and usage. \n");
     printf( " Note: (a) AlleleFrequency file must contain two tab-delimited columns with header 'SNP\tAF',\n");
     printf( "           and SNPs should be same as the validation vcf file. \n");
     cout<<endl<<endl;
