@@ -21,6 +21,7 @@ public:
     vector<Bin> aggBins;
     bool hasAlleleFreq;
     IFILE AlleleFreqFile;
+    IFILE RSquareFile;
 //    IFILE CommonSNPsFile;
     int NoAlleleFreqRead;
     Record CurrentRecord;
@@ -40,6 +41,7 @@ public:
     bool EvaluateAggRSquare();
     void CloseStreamInputFiles();
     bool OutputAggRSquare();
+    void OutputRSquare(double freq);
 
     bool FindCommonVariant();
     bool ProcessCommonVariant();

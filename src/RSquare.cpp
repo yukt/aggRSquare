@@ -88,6 +88,8 @@ bool RSquare::ProcessCommonVariant()
     CurrentRecord.clear();
     for(int i=0; i<NoSamples; i++)
         CurrentRecord.Update(Validation.GetNumGeno(i), Validation.GetDosage(i), Imputation.GetDosage(i));
+    if(CurrentRecord.n<1)
+        return true;
     double freq = GetAlleleFreq();
     if(freq < 0)
         return false;
@@ -148,12 +150,30 @@ void RSquare::UpdateAggBins(double freq)
             if(maf <= BinsCutoffs[i+1])
             {
                 aggBins[i].AddRecord(CurrentRecord, freq);
+                if(myUserVariables->detail) OutputRSquare(freq);
                 NoCommonVariantsAnalyzed++;
                 break;
             }
         }
     }
 }
+
+void RSquare::OutputRSquare(double freq)
+{
+    int numGeno = CurrentRecord.n;
+    double R2 = 0.0;
+    double EX   = CurrentRecord.sumX *1.0/numGeno;
+    double EY   = CurrentRecord.sumY *1.0/numGeno;
+    double varX = CurrentRecord.sumX2*1.0/numGeno - EX*EX;
+    double varY = CurrentRecord.sumY2*1.0/numGeno - EY*EY;
+    double cov  = CurrentRecord.sumXY*1.0/numGeno - EX*EY;
+    if(varX>0 && varY>0)
+        R2 = 1.0*cov/varX*cov/varY;
+
+    ifprintf(RSquareFile, "%s\t%f\t%8d\t%f\t%f\t%f\n",Validation.CurrentVariantName.c_str(), freq, numGeno, R2, EX, EY);
+}
+
+
 
 bool RSquare::UpdateInputRecords()
 {
@@ -180,6 +200,8 @@ void RSquare::CloseStreamInputFiles()
 //    ifclose(CommonSNPsFile);
     if(hasAlleleFreq)
         ifclose(AlleleFreqFile);
+    if(myUserVariables->detail)
+        ifclose(RSquareFile);
 }
 
 bool RSquare::OutputAggRSquare()
@@ -432,7 +454,20 @@ bool RSquare::OpenOutputFile()
         return false;
     }
     OutFile.close();
-//    CommonSNPsFile = ifopen("CommonSNPs", "w");
+
+    if(myUserVariables->detail)
+    {
+        RSquareFile = ifopen(myUserVariables->OutputPrefix+".RSquare", "w");
+        if(RSquareFile==NULL)
+        {
+            cout << "\n ERROR !!! Program could NOT create the output file " << myUserVariables->OutputPrefix+".RSquare" << " !!!" << endl;
+            cout <<" Please check your write permissions in the output directory\n OR maybe the output directory does NOT exist ...\n";
+            cout << "\n Program Exiting ... \n\n";
+            return false;
+        }
+
+        ifprintf(RSquareFile, "#SNP.ID\tAllele.Frequency\tNum.Geno\tImputation.R2\tValidation.AF\tImputation.AF\n");
+    }
     return true;
 
 }

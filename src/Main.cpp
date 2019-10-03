@@ -19,6 +19,7 @@ int main(int argc, char ** argv)
                     {"imputationFormat", required_argument, NULL, 'g'},
                     {"AF",               required_argument, NULL, 'a'},
                     {"bins",             required_argument, NULL, 'b'},
+                    {"detail",           no_argument      , NULL, 'd'},
                     {"help",             no_argument      , NULL, 'h'},
                     {NULL,0,NULL,0}
             };
@@ -33,6 +34,7 @@ int main(int argc, char ** argv)
             case 'g': myUserVariables.formatImputation   = optarg;   break;
             case 'a': myUserVariables.AlleleFreqFileName = optarg;   break;
             case 'b': myUserVariables.BinsFileName       = optarg;   break;
+            case 'd': myUserVariables.detail             = true;     break;
             case 'h': helpFile(); return 0;
             case '?': helpFile(); return 0;
             default: printf("[ERROR:] Unknown argument: %s\n", optarg);

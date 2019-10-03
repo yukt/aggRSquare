@@ -20,6 +20,8 @@ public:
     string formatValidation, formatImputation;
     string CommandLine;
 
+    bool detail;
+
     UserVariables() {
         ValidationFileName = "";
         ImputationFileName = "";
@@ -28,6 +30,7 @@ public:
         OutputPrefix       = "";
         formatValidation   = "GT";
         formatImputation   = "DS";
+        detail = false;
     };
 
     void CreateCommandLine(int argc, char ** argv)
@@ -60,6 +63,7 @@ public:
         printf( "   --bins       [%s]\n", BinsFileName.c_str());
         printf( "   --validationFormat [%s]\n", formatValidation.c_str());
         printf( "   --imputationFormat [%s]\n", formatImputation.c_str());
+        printf( "   --detail     [%s]\n", detail?"ON":"OFF");
         printf("\n\n");
     }
 
