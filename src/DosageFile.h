@@ -24,7 +24,7 @@ public:
     VcfFileReader* InputDosageStream;
     VcfRecord*     CurrentRecord;
     VcfRecordGenotype* GenotypeInfo;
-    int CurrentBp;
+    int CurrentChr, CurrentBp;
     string CurrentVariantName;
 
     DosageFile(String &filename, string &format)

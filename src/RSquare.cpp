@@ -57,28 +57,44 @@ bool RSquare::FindCommonVariant()
 {
     while(true)
     {
-        while(Validation.CurrentBp != Imputation.CurrentBp)
+        while(Validation.CurrentChr != Imputation.CurrentChr)
         {
-            while(Validation.CurrentBp < Imputation.CurrentBp)
+            while(Validation.CurrentChr < Imputation.CurrentChr)
             {
                 if(!Validation.ReadRecord())
                     return false;
             }
-            while(Validation.CurrentBp > Imputation.CurrentBp)
+            while(Validation.CurrentChr > Imputation.CurrentChr)
             {
                 if(!Imputation.ReadRecord())
                     return false;
             }
         }
-
-        if(Validation.CurrentVariantName==Imputation.CurrentVariantName)
+        if(Validation.CurrentChr == Imputation.CurrentChr)
         {
+            while(Validation.CurrentBp != Imputation.CurrentBp)
+            {
+                while(Validation.CurrentBp < Imputation.CurrentBp)
+                {
+                    if(!Validation.ReadRecord())
+                        return false;
+                }
+                while(Validation.CurrentBp > Imputation.CurrentBp)
+                {
+                    if(!Imputation.ReadRecord())
+                        return false;
+                }
+            }
+
+            if(Validation.CurrentVariantName==Imputation.CurrentVariantName)
+            {
 //            ifprintf(CommonSNPsFile, "%s\n", Validation.CurrentVariantName.c_str());
-            NoCommonVariants++;
-            return true;
+                NoCommonVariants++;
+                return true;
+            }
+            if(!Imputation.ReadRecord())
+                return false;
         }
-        if(!Imputation.ReadRecord())
-            return false;
     }
 }
 

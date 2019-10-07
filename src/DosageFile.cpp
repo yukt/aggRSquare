@@ -109,11 +109,16 @@ bool DosageFile::ReadRecord()
     {
         CurrentBp = CurrentRecord->get1BasedPosition();
         string chr(CurrentRecord->getChromStr());
+        if(chr[0]=='c')
+            CurrentChr = stoi(chr.substr(3, chr.size()-1));
+        else
+            CurrentChr = stoi(chr);
         CurrentVariantName = chr+":"+to_string(CurrentBp)+":"+ CurrentRecord->getRefStr()+":"+CurrentRecord->getAltStr();
         GenotypeInfo = &(CurrentRecord->getGenotypeInfo());
         NoMarkers++;
         return true;
     }
+    CurrentChr = 99;
     CurrentBp = MAXBP;
     CurrentVariantName = "No:More:Variant:Period";
     return false;
