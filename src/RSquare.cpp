@@ -70,22 +70,23 @@ bool RSquare::FindCommonVariant()
                     return false;
             }
         }
+
+        while(Validation.CurrentChr == Imputation.CurrentChr && Validation.CurrentBp != Imputation.CurrentBp)
+        {
+            if(Validation.CurrentBp < Imputation.CurrentBp)
+            {
+                if(!Validation.ReadRecord())
+                    return false;
+            }
+            else
+            {
+                if(!Imputation.ReadRecord())
+                    return false;
+            }
+        }
+
         if(Validation.CurrentChr == Imputation.CurrentChr)
         {
-            while(Validation.CurrentBp != Imputation.CurrentBp)
-            {
-                while(Validation.CurrentBp < Imputation.CurrentBp)
-                {
-                    if(!Validation.ReadRecord())
-                        return false;
-                }
-                while(Validation.CurrentBp > Imputation.CurrentBp)
-                {
-                    if(!Imputation.ReadRecord())
-                        return false;
-                }
-            }
-
             if(Validation.CurrentVariantName==Imputation.CurrentVariantName)
             {
 //            ifprintf(CommonSNPsFile, "%s\n", Validation.CurrentVariantName.c_str());
