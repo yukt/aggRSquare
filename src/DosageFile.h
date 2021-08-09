@@ -12,6 +12,28 @@
 
 using namespace std;
 
+class Dosage
+{
+public:
+    string VariantName;
+    string Format;
+    vector<double> dose;
+    double AlleleFreq;
+
+    Dosage(string &name, string &format)
+    {
+        VariantName = name;
+        Format = format;
+    }
+
+
+    void LoadAlleleFreq(double freq)
+    {
+        AlleleFreq = freq;
+    }
+    bool LoadDosage(VcfRecordGenotype& GenotypeInfo);
+};
+
 class DosageFile
 {
 public:

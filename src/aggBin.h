@@ -42,19 +42,22 @@ public:
         sumXYrev = 0.0;
     }
 
-    void Update(int numGeno, double x, double y)
+    void Update(int numGeno, double validationDose, double imputationDose)
     {
-        if(x<0 || y<0)
+        if(validationDose<0 || imputationDose<0)
             return;
-        n+=numGeno;
+        n++;
+        double x = 1.0/numGeno*validationDose;
+        double y = 1.0/numGeno*imputationDose;
+
         sumX += x;
         sumY += y;
         sumX2 += x*x;
         sumY2 += y*y;
         sumXY += x*y;
-        sumX2rev += (numGeno-x)*(numGeno-x);
-        sumY2rev += (numGeno-y)*(numGeno-y);
-        sumXYrev += (numGeno-x)*(numGeno-y);
+        sumX2rev += (1-x)*(1-x);
+        sumY2rev += (1-y)*(1-y);
+        sumXYrev += (1-x)*(1-y);
     }
 
     double GetAlleleFreq()

@@ -57,7 +57,8 @@ int main(int argc, char ** argv)
 
     int time_tot = time(0) - start_time;
     cout << "\n Analysis finished." << endl;
-    cout << "   -- Analyzed " << myAnalysis.NoCommonVariantsAnalyzed << " common variants." << endl;
+    cout << "   -- Found " << myAnalysis.NoCommonVariants << " common variants." << endl;
+    cout << "   -- Analysis included " << myAnalysis.NoCommonVariantsAnalyzed << " variants." << endl;
     cout << "   -- Analysis took " << time_tot << " seconds." << endl;
     return 0;
 }

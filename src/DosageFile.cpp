@@ -4,6 +4,41 @@
 #include "DosageFile.h"
 #define MAXBP 999999999
 
+double string2dosage(string &temp)
+{
+    double value = 0.0;
+    char *pch = strtok((char *)temp.c_str(),"|/");
+    while (pch != NULL)
+    {
+        if(strcmp(pch, ".")==0)
+            return -1;
+        try
+        {
+            value += stod(pch);
+        }
+        catch(exception& e)
+        {
+            return -1;
+        }
+        pch = strtok (NULL, "|/");
+    }
+    return value;
+}
+
+bool Dosage::LoadDosage(VcfRecordGenotype &GenotypeInfo)
+{
+    int NoSamples = GenotypeInfo.getNumSamples();
+    dose.clear();
+    dose.resize(NoSamples);
+    for (int i=0; i<NoSamples; i++)
+    {
+        string temp = *GenotypeInfo.getString(Format, i);
+        double value = string2dosage(temp);
+        dose[i] = value;
+    }
+    return true;
+}
+
 bool DosageFile::CheckValidity()
 {
     if(!ValidFileType())

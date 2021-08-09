@@ -25,6 +25,8 @@ public:
 //    IFILE CommonSNPsFile;
     int NoAlleleFreqRead;
     Record CurrentRecord;
+    int ValidationBufferBp;
+    vector<Dosage> ValidationBuffer;
 
     RSquare(UserVariables &ThisUserVariables)
     :myUserVariables(&ThisUserVariables),
@@ -43,8 +45,10 @@ public:
     bool OutputAggRSquare();
     void OutputRSquare(double freq);
 
-    bool FindCommonVariant();
+    bool FindSamePosition();
+    bool LoadValidationBuffer();
     bool ProcessCommonVariant();
+    double ReadAlleleFreq();
     double GetAlleleFreq();
     void UpdateAggBins(double freq);
     bool UpdateInputRecords();

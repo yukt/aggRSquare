@@ -42,18 +42,20 @@ bool RSquare::EvaluateAggRSquare()
 {
     NoCommonVariants = 0;
     NoCommonVariantsAnalyzed = 0;
+    ValidationBuffer.clear();
+
     while(true)
     {
-        if(!FindCommonVariant())
+        if(!FindSamePosition())
             return true;
-        if(!ProcessCommonVariant())
+        if(!LoadValidationBuffer())
             return false;
-        if(!UpdateInputRecords())
+        if(!ProcessCommonVariant())
             return true;
     }
 }
 
-bool RSquare::FindCommonVariant()
+bool RSquare::FindSamePosition()
 {
     while(true)
     {
@@ -85,81 +87,117 @@ bool RSquare::FindCommonVariant()
             }
         }
 
-        if(Validation.CurrentChr == Imputation.CurrentChr)
+        if(Validation.CurrentChr == Imputation.CurrentChr && Validation.CurrentBp == Imputation.CurrentBp)
         {
-            if(Validation.CurrentVariantName==Imputation.CurrentVariantName)
-            {
-//            ifprintf(CommonSNPsFile, "%s\n", Validation.CurrentVariantName.c_str());
-                NoCommonVariants++;
-                return true;
-            }
-            if(!Imputation.ReadRecord())
-                return false;
+            return true;
         }
     }
 }
 
+bool RSquare::LoadValidationBuffer()
+{
+    ValidationBuffer.clear();
+    ValidationBufferBp = Validation.CurrentBp;
+
+    while (Validation.CurrentBp == ValidationBufferBp)
+    {
+        Dosage CurrentDosage(Validation.CurrentVariantName, Validation.Format);
+        if(hasAlleleFreq)
+        {
+            double freq = ReadAlleleFreq();
+            if(freq < 0)
+                return false;
+            CurrentDosage.LoadAlleleFreq(freq);
+        }
+        CurrentDosage.LoadDosage(*(Validation.GenotypeInfo));
+        ValidationBuffer.push_back(CurrentDosage);
+        if(!Validation.ReadRecord())
+            break;
+    }
+    return true;
+}
 
 bool RSquare::ProcessCommonVariant()
 {
-    CurrentRecord.clear();
-    for(int i=0; i<NoSamples; i++)
-        CurrentRecord.Update(Validation.GetNumGeno(i), Validation.GetDosage(i), Imputation.GetDosage(i));
-    if(CurrentRecord.n<1)
+    if (ValidationBuffer.empty())
         return true;
-    double freq = GetAlleleFreq();
-    if(freq < 0)
-        return false;
-    UpdateAggBins(freq);
+    while(Imputation.CurrentBp == ValidationBufferBp)
+    {
+        int NoBufferVariants = ValidationBuffer.size();
+        for (int i=0; i<NoBufferVariants; i++)
+        {
+            if(Imputation.CurrentVariantName == ValidationBuffer[i].VariantName)
+            {
+                CurrentRecord.clear();
+                vector<double>& ValidationDose = ValidationBuffer[i].dose;
+                for(int j=0; j<NoSamples; j++)
+                    CurrentRecord.Update(Imputation.GetNumGeno(j), ValidationDose[j], Imputation.GetDosage(j));
+                double freq;
+                if(hasAlleleFreq)
+                    freq = ValidationBuffer[i].AlleleFreq;
+                else
+                    freq = CurrentRecord.GetAlleleFreq();
+                UpdateAggBins(freq);
+                break;
+            }
+        }
+        if(!Imputation.ReadRecord())
+            return true;
+    }
     return true;
+}
+
+double RSquare::ReadAlleleFreq()
+{
+    string line;
+    while(NoAlleleFreqRead < Validation.NoMarkers)
+    {
+        line = "";
+        if(AlleleFreqFile->readLine(line)<0)
+        {
+            cout << "\n ERROR !!! Allele Freq file has fewer records than Validation VCF file !!! " << endl;
+            cout << "\n Program Exiting ... \n\n";
+            return -1;
+        }
+        if (line.length()==0 || line.find("#") == 0)
+            continue;
+        NoAlleleFreqRead++;
+    }
+    char* pch = strtok((char *)line.c_str(), "\t");
+    string VariantName(pch);
+    if(VariantName != Validation.CurrentVariantName)
+    {
+        cout << "\n ERROR !!! Allele Freq file does NOT match Validation VCF file !!! " << endl;
+        cout << "\n Program Exiting ... \n\n";
+        return -1;
+    }
+    pch = strtok(NULL, "\t");
+    double AlleleFreq;
+    try
+    {
+        AlleleFreq = stod(pch);
+    }
+    catch (exception& e)
+    {
+        cout << " Warning !!! " << "Skip " << VariantName << " ( invalid allele frequency " << pch << " ) !!!" << endl;
+        return 99;
+    }
+    return AlleleFreq;
 }
 
 double RSquare::GetAlleleFreq()
 {
     if(hasAlleleFreq)
-    {
-        string line;
-        while(NoAlleleFreqRead < Validation.NoMarkers)
-        {
-            line = "";
-            if(AlleleFreqFile->readLine(line)<0)
-            {
-                cout << "\n ERROR !!! Allele Freq file has fewer records than Validation VCF file !!! " << endl;
-                cout << "\n Program Exiting ... \n\n";
-                return -1;
-            }
-            if (line.length()==0 || line.find("#") == 0)
-                continue;
-            NoAlleleFreqRead++;
-        }
-        char* pch = strtok((char *)line.c_str(), "\t");
-        string VariantName(pch);
-        if(VariantName != Validation.CurrentVariantName)
-        {
-            cout << "\n ERROR !!! Allele Freq file does NOT match Validation VCF file !!! " << endl;
-            cout << "\n Program Exiting ... \n\n";
-            return -1;
-        }
-        pch = strtok(NULL, "\t");
-        double AlleleFreq;
-        try
-        {
-            AlleleFreq = stod(pch);
-        }
-        catch (exception& e)
-        {
-            cout << " Warning !!! " << "Skip" << VariantName << " ( invalid allele frequency " << pch << ") !!!" << endl;
-            return 0;
-        }
-        return AlleleFreq;
-    }
+        return ReadAlleleFreq();
     return CurrentRecord.GetAlleleFreq();
 }
 
 void RSquare::UpdateAggBins(double freq)
 {
     double maf = min(freq, 1.0-freq);
+    NoCommonVariants++;
 
+    bool analyzed_flag = false;
     if(maf > BinsCutoffs[0])
     {
         for(int i=0; i<NoAggBins; i++)
@@ -169,10 +207,13 @@ void RSquare::UpdateAggBins(double freq)
                 aggBins[i].AddRecord(CurrentRecord, freq);
                 if(myUserVariables->detail) OutputRSquare(freq);
                 NoCommonVariantsAnalyzed++;
+                analyzed_flag = true;
                 break;
             }
         }
     }
+//    if(!analyzed_flag)
+//        cout << "    Skip " <<  Imputation.CurrentVariantName << " (MAF = " << freq << ")." << endl;
 }
 
 void RSquare::OutputRSquare(double freq)
@@ -187,7 +228,7 @@ void RSquare::OutputRSquare(double freq)
     if(varX>0 && varY>0)
         R2 = 1.0*cov/varX*cov/varY;
 
-    ifprintf(RSquareFile, "%s\t%f\t%8d\t%f\t%f\t%f\n",Validation.CurrentVariantName.c_str(), freq, numGeno, R2, EX, EY);
+    ifprintf(RSquareFile, "%s\t%f\t%8d\t%f\t%f\t%f\n",Imputation.CurrentVariantName.c_str(), freq, numGeno, R2, EX, EY);
 }
 
 
@@ -483,7 +524,7 @@ bool RSquare::OpenOutputFile()
             return false;
         }
 
-        ifprintf(RSquareFile, "#SNP.ID\tAllele.Frequency\tNum.Geno\tImputation.R2\tValidation.AF\tImputation.AF\n");
+        ifprintf(RSquareFile, "#SNP.ID\tAllele.Frequency\tNo.Samples\tImputation.R2\tValidation.AF\tImputation.AF\n");
     }
     return true;
 
