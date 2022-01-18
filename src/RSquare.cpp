@@ -57,6 +57,11 @@ bool RSquare::EvaluateAggRSquare()
 
 bool RSquare::FindSamePosition()
 {
+    if(Imputation.CurrentVariantName=="No:More:Variant:Period")
+        return false;
+    if(Validation.CurrentVariantName=="No:More:Variant:Period")
+        return false;
+
     while(true)
     {
         while(Validation.CurrentChr != Imputation.CurrentChr)

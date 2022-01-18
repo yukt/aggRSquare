@@ -6,6 +6,7 @@
 #define AGGRSQUARE_AGGBIN_H
 
 #include <algorithm>
+#include <cmath>
 
 class Record
 {
