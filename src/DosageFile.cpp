@@ -4,6 +4,19 @@
 #include "DosageFile.h"
 #define MAXBP 999999999
 
+inline int chr2int(string &chr)
+{
+    if(chr == "chrX" or chr == "X")
+        return 23;
+    if(chr == "chrY" or chr == "Y")
+        return 24;
+    if(chr == "chrMT" or chr == "MT")
+        return 25;
+    if(chr[0]=='c')
+        return stoi(chr.substr(3, chr.size()-1));
+    return stoi(chr);
+}
+
 double string2dosage(string &temp)
 {
     double value = 0.0;
@@ -78,6 +91,19 @@ bool DosageFile::ValidFileType()
     return false;
 }
 
+bool ValidChrom(string chr)
+{
+    std::vector<string> ValidChromList {"1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16",
+                                        "17","18","19","20","21","22","23","X","Y", "MT",
+                                        "chr1","chr2","chr3","chr4","chr5","chr6","chr7","chr8","chr9","chr10",
+                                        "chr11","chr12","chr13","chr14","chr15","chr16","chr17","chr18","chr19",
+                                        "chr20","chr21","chr22","chr23","chrX","chrY", "chrMT"};
+    for(string valid_chr : ValidChromList)
+        if(chr == valid_chr)
+            return true;
+    return false;
+}
+
 bool DosageFile::ValidSampleInfo()
 {
     VcfFileReader inFile;
@@ -108,6 +134,13 @@ bool DosageFile::ValidSampleInfo()
     inFile.close();
 
     ChrId = record.getChromStr();
+    if(!ValidChrom(ChrId))
+    {
+        cout << "\n ERROR !!! " << FileName << " contains invalid chromosome " << ChrId << " !!! " << endl;
+        cout << "\n Program Exiting ... \n\n";
+        return false;
+    }
+
     VcfRecordGenotype &ThisGenotype=record.getGenotypeInfo();
     const string* temp = ThisGenotype.getString(Format, 0);
     if(temp==NULL)
@@ -144,10 +177,7 @@ bool DosageFile::ReadRecord()
     {
         CurrentBp = CurrentRecord->get1BasedPosition();
         string chr(CurrentRecord->getChromStr());
-        if(chr[0]=='c')
-            CurrentChr = stoi(chr.substr(3, chr.size()-1));
-        else
-            CurrentChr = stoi(chr);
+        CurrentChr = chr2int(chr);
         CurrentVariantName = chr+":"+to_string(CurrentBp)+":"+ CurrentRecord->getRefStr()+":"+CurrentRecord->getAltStr();
         GenotypeInfo = &(CurrentRecord->getGenotypeInfo());
         NoMarkers++;
