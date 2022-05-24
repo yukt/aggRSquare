@@ -20,7 +20,7 @@ inline int chr2int(string &chr)
 double string2dosage(string &temp)
 {
     double value = 0.0;
-    char *pch = strtok((char *)temp.c_str(),"|/");
+    char *pch = strtok((char *)temp.c_str(),"|/,");
     while (pch != NULL)
     {
         if(strcmp(pch, ".")==0)
@@ -33,7 +33,7 @@ double string2dosage(string &temp)
         {
             return -1;
         }
-        pch = strtok (NULL, "|/");
+        pch = strtok (NULL, "|/,");
     }
     return value;
 }
