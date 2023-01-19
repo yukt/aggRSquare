@@ -45,7 +45,7 @@ which will generate MAF bins `(0,0.005]`,`(0.005,0.001]`, ... , `(0.4,0.5]`.
 ### Allele Frequency File
 The allele frequency file should contain two **tab-delimited** columns including SNP and the corresponding allele frequency. No header is needed, and any line starting with "#" will be ignored.
 
-The SNP should be in the format of CHROM:POS:REF:ALT, and the order of SNPs should be exactly the same as that in the input validation file. The allele frequency should be float numbers, and any other values will be treated as missingness and igored in the analysis.
+The SNP should be in the format of CHROM:POS:REF:ALT, and the order of SNPs should be exactly the same as that in the input validation file. The allele frequency should be float numbers, and any other values will be treated as missingness and ignored in the analysis.
 
 Example:
 ```
