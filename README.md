@@ -49,6 +49,8 @@ The SNP should be in the format of CHROM:POS:REF:ALT, and the order of SNPs shou
 
 Example:
 ```
+#The columns should be tab-delimited
+#Lines starting with # will be ignored
 #SNP	AF
 chr1:925875:A:G	NA
 chr1:925881:G:A	0.002625
