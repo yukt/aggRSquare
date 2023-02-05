@@ -114,8 +114,8 @@ bool RSquare::LoadValidationBuffer()
                 return false;
             CurrentDosage.LoadAlleleFreq(freq);
         }
-        CurrentDosage.LoadDosage(*(Validation.GenotypeInfo));
-        ValidationBuffer.push_back(CurrentDosage);
+        if(CurrentDosage.LoadDosage(*(Validation.GenotypeInfo)))
+            ValidationBuffer.push_back(CurrentDosage);
         if(!Validation.ReadRecord())
             break;
     }

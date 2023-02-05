@@ -43,11 +43,20 @@ bool Dosage::LoadDosage(VcfRecordGenotype &GenotypeInfo)
     int NoSamples = GenotypeInfo.getNumSamples();
     dose.clear();
     dose.resize(NoSamples);
+
+    int num_valid_values = 0;
     for (int i=0; i<NoSamples; i++)
     {
         string temp = *GenotypeInfo.getString(Format, i);
         double value = string2dosage(temp);
         dose[i] = value;
+        if(value > -1)
+            num_valid_values++;
+    }
+    if(num_valid_values < 1)
+    {
+        cout << " Warning !!! " << "Skip " << VariantName << " ( 0 sample for validation ) !!!" << endl;
+        return false;
     }
     return true;
 }
