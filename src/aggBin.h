@@ -71,7 +71,7 @@ class Bin
 {
 public:
     int BinId;
-    int NoVariants;
+    unsigned long NoVariants;
     double lowerBound, upperBound;
     double MAF, R2, ValidationMAF, ImputationMAF;
     double sumX, sumY, sumX2, sumY2, sumXY;

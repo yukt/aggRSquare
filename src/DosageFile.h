@@ -39,14 +39,16 @@ class DosageFile
 public:
     String FileName;
     string Format;
-    int NoMarkers, NoSamples;
+    unsigned long NoMarkers;
+    unsigned int NoSamples;
     vector<string> SampleNames;
     string ChrId;
 
     VcfFileReader* InputDosageStream;
     VcfRecord*     CurrentRecord;
     VcfRecordGenotype* GenotypeInfo;
-    int CurrentChr, CurrentBp;
+    int CurrentChr;
+    unsigned long CurrentBp;
     string CurrentVariantName;
 
     DosageFile(String &filename, string &format)
@@ -65,8 +67,8 @@ public:
     void OpenStream();
     void CloseStream();
     bool ReadRecord();
-    double GetDosage(int SampleId);
-    double GetNumGeno(int SampleId);
+    double GetDosage(int SampleId) const;
+    int GetNumGeno(int SampleId) const;
 
 };
 

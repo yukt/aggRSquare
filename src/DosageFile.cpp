@@ -2,7 +2,7 @@
 // Created by Ketian Yu on 9/23/19.
 //
 #include "DosageFile.h"
-#define MAXBP 999999999
+#define MAXBP 99999999999
 
 inline int chr2int(string &chr)
 {
@@ -40,12 +40,12 @@ double string2dosage(string &temp)
 
 bool Dosage::LoadDosage(VcfRecordGenotype &GenotypeInfo)
 {
-    int NoSamples = GenotypeInfo.getNumSamples();
+    unsigned int NoSamples = GenotypeInfo.getNumSamples();
     dose.clear();
     dose.resize(NoSamples);
 
-    int num_valid_values = 0;
-    for (int i=0; i<NoSamples; i++)
+    unsigned int num_valid_values = 0;
+    for (unsigned int i=0; i<NoSamples; i++)
     {
         string temp = *GenotypeInfo.getString(Format, i);
         double value = string2dosage(temp);
@@ -135,7 +135,7 @@ bool DosageFile::ValidSampleInfo()
     }
 
     SampleNames.resize(NoSamples);
-    for(int i=0; i<NoSamples; i++)
+    for(unsigned int i=0; i<NoSamples; i++)
         SampleNames[i] = header.getSampleName(i);
 
     inFile.setSiteOnly(false);
@@ -198,7 +198,7 @@ bool DosageFile::ReadRecord()
     return false;
 }
 
-double DosageFile::GetDosage(int SampleId)
+double DosageFile::GetDosage(int SampleId) const
 {
     string temp=*GenotypeInfo->getString(Format,SampleId);
     double dosage = 0.0;
@@ -221,6 +221,6 @@ double DosageFile::GetDosage(int SampleId)
     return dosage;
 }
 
-double DosageFile::GetNumGeno(int SampleId){
+int DosageFile::GetNumGeno(int SampleId) const{
     return CurrentRecord->getNumGTs(SampleId);
 }

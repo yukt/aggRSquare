@@ -128,14 +128,14 @@ bool RSquare::ProcessCommonVariant()
         return true;
     while(Imputation.CurrentBp == ValidationBufferBp)
     {
-        int NoBufferVariants = ValidationBuffer.size();
+        unsigned long NoBufferVariants = ValidationBuffer.size();
         for (int i=0; i<NoBufferVariants; i++)
         {
             if(Imputation.CurrentVariantName == ValidationBuffer[i].VariantName)
             {
                 CurrentRecord.clear();
                 vector<double>& ValidationDose = ValidationBuffer[i].dose;
-                for(int j=0; j<NoSamples; j++)
+                for(unsigned int j=0; j<NoSamples; j++)
                     CurrentRecord.Update(Imputation.GetNumGeno(j), ValidationDose[j], Imputation.GetDosage(j));
                 double freq;
                 if(hasAlleleFreq)
@@ -221,7 +221,7 @@ void RSquare::UpdateAggBins(double freq)
 //        cout << "    Skip " <<  Imputation.CurrentVariantName << " (MAF = " << freq << ")." << endl;
 }
 
-void RSquare::OutputRSquare(double freq)
+void RSquare::OutputRSquare(double freq) const
 {
     unsigned int numGeno = CurrentRecord.n;
     double R2 = 0.0;
@@ -291,7 +291,7 @@ bool RSquare::OutputAggRSquare()
         Bin &ThisBin = aggBins[i];
         ThisBin.Summarize();
         if (ThisBin.NoVariants > 0) {
-            fprintf(OutFile, "(%f,%f]\t%f\t%-9d\t%f\t%f\t%f\n",
+            fprintf(OutFile, "(%f,%f]\t%f\t%lu\t%f\t%f\t%f\n",
                     ThisBin.lowerBound, ThisBin.upperBound,
                     ThisBin.MAF,
                     ThisBin.NoVariants,
@@ -339,7 +339,7 @@ bool RSquare::CompatibleSamples()
 
     NoSamples = Validation.NoSamples;
 
-    for(int i=0; i<NoSamples; i++)
+    for(unsigned int i=0; i<NoSamples; i++)
     {
         if(Validation.SampleNames[i]!=Imputation.SampleNames[i])
         {
@@ -486,7 +486,7 @@ bool RSquare::CheckAlleleFreqFile()
     return true;
 }
 
-bool RSquare::CheckSNPNameFormat(char* snp)
+bool RSquare::CheckSNPNameFormat(char* snp) const
 {
     int NoColons = 0;
     for(int i=0; i<strlen(snp); i++)

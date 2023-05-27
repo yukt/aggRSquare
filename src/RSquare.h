@@ -16,16 +16,17 @@ class RSquare
 public:
     UserVariables* myUserVariables;
     DosageFile Validation, Imputation;
-    int NoAggBins, NoCommonVariants, NoSamples, NoCommonVariantsAnalyzed;
+    unsigned long NoCommonVariants, NoCommonVariantsAnalyzed;
+    unsigned int NoAggBins, NoSamples;
     vector<double> BinsCutoffs;
     vector<Bin> aggBins;
     bool hasAlleleFreq;
     IFILE AlleleFreqFile;
     IFILE RSquareFile;
 //    IFILE CommonSNPsFile;
-    int NoAlleleFreqRead;
+    unsigned long NoAlleleFreqRead;
     Record CurrentRecord;
-    int ValidationBufferBp;
+    unsigned long ValidationBufferBp;
     vector<Dosage> ValidationBuffer;
 
     RSquare(UserVariables &ThisUserVariables)
@@ -43,7 +44,7 @@ public:
     bool EvaluateAggRSquare();
     void CloseStreamInputFiles();
     bool OutputAggRSquare();
-    void OutputRSquare(double freq);
+    void OutputRSquare(double freq) const;
 
     bool FindSamePosition();
     bool LoadValidationBuffer();
@@ -59,7 +60,7 @@ public:
     bool CreateAggBins();
     bool LoadBinsFile();
     bool CheckAlleleFreqFile();
-    bool CheckSNPNameFormat(char* snp);
+    bool CheckSNPNameFormat(char* snp) const;
     bool OpenOutputFile();
 };
 
