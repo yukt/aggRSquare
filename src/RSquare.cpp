@@ -223,7 +223,7 @@ void RSquare::UpdateAggBins(double freq)
 
 void RSquare::OutputRSquare(double freq)
 {
-    int numGeno = CurrentRecord.n;
+    unsigned int numGeno = CurrentRecord.n;
     double R2 = 0.0;
     double EX   = CurrentRecord.sumX *1.0/numGeno;
     double EY   = CurrentRecord.sumY *1.0/numGeno;
@@ -233,7 +233,7 @@ void RSquare::OutputRSquare(double freq)
     if(varX>0 && varY>0)
         R2 = 1.0*cov/varX*cov/varY;
 
-    ifprintf(RSquareFile, "%s\t%f\t%8d\t%f\t%f\t%f\n",Imputation.CurrentVariantName.c_str(), freq, numGeno, R2, EX, EY);
+    ifprintf(RSquareFile, "%s\t%f\t%d\t%f\t%f\t%f\n",Imputation.CurrentVariantName.c_str(), freq, numGeno, R2, EX, EY);
 }
 
 

@@ -11,7 +11,7 @@
 class Record
 {
 public:
-    int n;
+    unsigned int n;
     double sumX, sumY, sumX2, sumY2, sumXY;
     double sumX2rev, sumY2rev, sumXYrev;
     // X - Validation
@@ -61,7 +61,7 @@ public:
         sumXYrev += (1-x)*(1-y);
     }
 
-    double GetAlleleFreq()
+    double GetAlleleFreq() const
     {
         return sumX*1.0/n;
     }
@@ -75,7 +75,7 @@ public:
     double lowerBound, upperBound;
     double MAF, R2, ValidationMAF, ImputationMAF;
     double sumX, sumY, sumX2, sumY2, sumXY;
-    int n;
+    unsigned int n;
 
     Bin()
     {
